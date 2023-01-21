@@ -188,6 +188,7 @@ static Client *nexttiled(Client *c);
 static void pop(Client *);
 static void propertynotify(XEvent *e);
 static void quit(const Arg *arg);
+static void lock_grab(const Arg *arg);
 static Monitor *recttomon(int x, int y, int w, int h);
 static void resize(Client *c, int x, int y, int w, int h, int interact);
 static void resizeclient(Client *c, int x, int y, int w, int h);
@@ -270,6 +271,8 @@ static Display *dpy;
 static Drw *drw;
 static Monitor *mons, *selmon;
 static Window root, wmcheckwin;
+
+static int lock_state = 0;
 
 /* configuration, allows nested code to access above variables */
 #include "config.h"
@@ -962,13 +965,14 @@ grabkeys(void)
 		unsigned int i, j;
 		unsigned int modifiers[] = { 0, LockMask, numlockmask, numlockmask|LockMask };
 		KeyCode code;
-
+		
 		XUngrabKey(dpy, AnyKey, AnyModifier, root);
 		for (i = 0; i < LENGTH(keys); i++)
 			if ((code = XKeysymToKeycode(dpy, keys[i].keysym)))
 				for (j = 0; j < LENGTH(modifiers); j++)
-					XGrabKey(dpy, code, keys[i].mod | modifiers[j], root,
-						True, GrabModeAsync, GrabModeAsync);
+					if (!lock_state || keys[i].func == &lock_grab)
+						XGrabKey(dpy, code, keys[i].mod | modifiers[j], root,
+							True, GrabModeAsync, GrabModeAsync);
 	}
 }
 
@@ -1003,7 +1007,8 @@ keypress(XEvent *e)
 	for (i = 0; i < LENGTH(keys); i++)
 		if (keysym == keys[i].keysym
 		&& CLEANMASK(keys[i].mod) == CLEANMASK(ev->state)
-		&& keys[i].func)
+		&& keys[i].func
+		&& (!lock_state || keys[i].func == &lock_grab))
 			keys[i].func(&(keys[i].arg));
 }
 
@@ -1259,6 +1264,14 @@ quit(const Arg *arg)
 {
 	running = 0;
 }
+
+void
+lock_grab(const Arg *arg)
+{
+	lock_state ^= 1;
+	grabkeys();
+}
+
 
 Monitor *
 recttomon(int x, int y, int w, int h)
