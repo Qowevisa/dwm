@@ -59,7 +59,7 @@
 
 /* enums */
 enum { CurNormal, CurResize, CurMove, CurLast }; /* cursor */
-enum { SchemeNorm, SchemeSel }; /* color schemes */
+enum { SchemeNorm, SchemeSel, SchemeLocked }; /* color schemes */
 enum { NetSupported, NetWMName, NetWMState, NetWMCheck,
        NetWMFullscreen, NetActiveWindow, NetWMWindowType,
        NetWMWindowTypeDialog, NetClientList, NetLast }; /* EWMH atoms */
@@ -713,9 +713,11 @@ drawbar(Monitor *m)
 	if (!m->showbar)
 		return;
 
+	Clr *schema = lock_state ? scheme[SchemeLocked] : scheme[SchemeNorm];
+
 	/* draw status first so it can be overdrawn by tags later */
 	if (m == selmon) { /* status is only drawn on selected monitor */
-		drw_setscheme(drw, scheme[SchemeNorm]);
+		drw_setscheme(drw, schema);
 		tw = TEXTW(stext) - lrpad + 2; /* 2px right padding */
 		drw_text(drw, m->ww - tw, 0, tw, bh, 0, stext, 0);
 	}
@@ -730,6 +732,7 @@ drawbar(Monitor *m)
 		w = TEXTW(tags[i]);
 		drw_setscheme(drw, scheme[m->tagset[m->seltags] & 1 << i ? SchemeSel : SchemeNorm]);
 		drw_text(drw, x, 0, w, bh, lrpad / 2, tags[i], urg & 1 << i);
+		drw_setscheme(drw, schema);
 		if (occ & 1 << i)
 			drw_rect(drw, x + boxw, 0, w - (2 * boxw + 1), boxw,
 				m == selmon && selmon->sel && selmon->sel->tags & 1 << i,
@@ -1269,6 +1272,7 @@ void
 lock_grab(const Arg *arg)
 {
 	lock_state ^= 1;
+	drawbars();
 	grabkeys();
 }
 
