@@ -275,7 +275,7 @@ static Window root, wmcheckwin;
 static int lock_state = 0;
 
 /* configuration, allows nested code to access above variables */
-#include "../inc/config.h"
+#include "../config.h"
 
 /* compile-time check if all tags fit into an unsigned int bit array. */
 struct NumTags { char limitexceeded[LENGTH(tags) > 31 ? -1 : 1]; };
