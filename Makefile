@@ -6,6 +6,8 @@ include config.mk
 SRC = drw.c dwm.c util.c
 OBJ = ${SRC:.c=.o}
 
+def: options dwm
+
 all: options dwm install
 
 options:
@@ -16,8 +18,6 @@ options:
 
 .c.o:
 	${CC} -c ${CFLAGS} $<
-
-${OBJ}: config.h config.mk
 
 dwm: ${OBJ}
 	${CC} -o $@ ${OBJ} ${LDFLAGS}
