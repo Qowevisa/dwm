@@ -1,6 +1,7 @@
 /* See LICENSE file for copyright and license details. */
 
 /* appearance */
+#include <X11/X.h>
 static const unsigned int borderpx  = 1;        /* border pixel of windows */
 static const unsigned int snap      = 32;       /* snap pixel */
 static const int showbar            = 1;        /* 0 means no bar */
@@ -88,6 +89,8 @@ static Key keys[] = {
 	{ MODKEY,                       XK_period,  focusmon,       {.i = +1 } },
 	{ MODKEY|ShiftMask,             XK_comma,   tagmon,         {.i = -1 } },
 	{ MODKEY|ShiftMask,             XK_period,  tagmon,         {.i = +1 } },
+	{ ControlMask|ShiftMask,	XK_h,	    prev_screen,    {0} },
+	{ ControlMask|ShiftMask,	XK_l,	    next_screen,    {0} },
 	TAGKEYS(                        XK_1,                       0)
 	TAGKEYS(                        XK_2,                       1)
 	TAGKEYS(                        XK_3,                       2)

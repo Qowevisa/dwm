@@ -231,6 +231,8 @@ static void updatetitle(Client *c);
 static void updatewindowtype(Client *c);
 static void updatewmhints(Client *c);
 static void view(const Arg *arg);
+static void next_screen(const Arg *arg);
+static void prev_screen(const Arg *arg);
 static Client *wintoclient(Window w);
 static Monitor *wintomon(Window w);
 static int xerror(Display *dpy, XErrorEvent *ee);
@@ -2085,6 +2087,26 @@ view(const Arg *arg)
 	selmon->seltags ^= 1; /* toggle sel tagset */
 	if (arg->ui & TAGMASK)
 		selmon->tagset[selmon->seltags] = arg->ui & TAGMASK;
+	focus(NULL);
+	arrange(selmon);
+}
+
+void
+next_screen(const Arg *arg)
+{
+	// selmon->seltags ^= 1; /* toggle sel tagset */
+	if (selmon->tagset[selmon->seltags] << 1 & TAGMASK)
+		selmon->tagset[selmon->seltags] <<= 1;
+	focus(NULL);
+	arrange(selmon);
+}
+
+void
+prev_screen(const Arg *arg)
+{
+	// selmon->seltags ^= 1; /* toggle sel tagset */
+	if (selmon->tagset[selmon->seltags] >> 1 & TAGMASK)
+		selmon->tagset[selmon->seltags] >>= 1;
 	focus(NULL);
 	arrange(selmon);
 }
