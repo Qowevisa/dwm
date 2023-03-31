@@ -4,7 +4,7 @@
 include config.mk
 
 SRC = drw.c dwm.c util.c
-OBJ = ${SRC:.c=.o}
+OBJ = ${SRC:%.c=./obj/%.o}
 
 def: options dwm
 
@@ -15,9 +15,10 @@ options:
 	@echo "CFLAGS   = ${CFLAGS}"
 	@echo "LDFLAGS  = ${LDFLAGS}"
 	@echo "CC       = ${CC}"
+	@echo "OBJ      = ${OBJ}"
 
-.c.o:
-	${CC} -c ${CFLAGS} $<
+./obj/%.o: ./src/%.c
+	${CC} -c ${CFLAGS} $< -o $@
 
 dwm: ${OBJ}
 	${CC} -o $@ ${OBJ} ${LDFLAGS}
